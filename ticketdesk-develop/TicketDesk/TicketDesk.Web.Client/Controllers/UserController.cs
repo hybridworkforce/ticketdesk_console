@@ -39,7 +39,9 @@ namespace TicketDesk.Web.Client.Controllers
     {
         private TicketDeskUserManager UserManager { get; set; }
         private TicketDeskSignInManager SignInManager { get; set; }
-        private TdDomainContext DomainContext { get; set; }
+		public static TicketDeskSignInManager SignInManagerApi { get; set; }
+
+		private TdDomainContext DomainContext { get; set; }
 
         public UserController(
             TicketDeskUserManager userManager,
@@ -48,7 +50,8 @@ namespace TicketDesk.Web.Client.Controllers
         {
             UserManager = userManager;
             SignInManager = signInManager;
-            DomainContext = domainContext;
+			SignInManagerApi = signInManager;
+			DomainContext = domainContext;
         }
 
         [AllowAnonymous]
@@ -71,7 +74,7 @@ namespace TicketDesk.Web.Client.Controllers
         [Route("register")]
         public async Task<ActionResult> Register(UserRegisterViewModel model)
         {
-            if (ModelState.IsValid)
+			   if (ModelState.IsValid)
             {
                 var user = new TicketDeskUser { UserName = model.UserName, Email = model.Email, DisplayName = model.DisplayName };
                 var result = await UserManager.CreateAsync(user, model.Password);
@@ -190,7 +193,24 @@ namespace TicketDesk.Web.Client.Controllers
             return View(model);
         }
 
-        [Route("sign-out")]
+		public void SignInApi(UserSignInViewModel model, string returnUrl)
+		{
+			
+
+			var result =  SignInManager.PasswordSignInAsync(model.UserNameOrEmail, model.Password, model.RememberMe, true);
+			if (result.Result != SignInStatus.Success && model.UserNameOrEmail.Contains("@"))
+			{
+				var user = UserManager.FindByEmailAsync(model.UserNameOrEmail);
+				if (user != null)
+				{
+					//result =  SignInManager.PasswordSignInAsync(user.UserName, model.Password, model.RememberMe, true);
+				}
+			}
+
+			
+		}
+
+		[Route("sign-out")]
         public ActionResult SignOut()
         {
             AuthenticationManager.SignOut();
