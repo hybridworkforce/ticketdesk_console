@@ -770,6 +770,7 @@
     <EmbeddedResource Include="Views\User\SignIn.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>SignIn.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

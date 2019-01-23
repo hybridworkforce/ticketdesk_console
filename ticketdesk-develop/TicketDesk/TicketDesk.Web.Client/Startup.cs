@@ -11,11 +11,12 @@
 // attribution must remain intact, and a copy of the license must be 
 // provided to the recipient.
 
-using System.Globalization;
+using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
 using Microsoft.Owin;
+using Newtonsoft.Json;
 using Owin;
 using TicketDesk.Web.Client;
 
@@ -24,19 +25,26 @@ namespace TicketDesk.Web.Client
 {
     public partial class Startup
     {
+        public static HttpConfiguration HttpConfiguration { get; set; } = new HttpConfiguration();
+
         public void Configuration(IAppBuilder app)
         {
             RegisterGlobalFilters(GlobalFilters.Filters);
             RegisterRoutes(RouteTable.Routes);
             RegisterBundles(BundleTable.Bundles);
             var container = RegisterStructureMap(app);
+            var config = Startup.HttpConfiguration;
+            var json = config.Formatters.JsonFormatter.SerializerSettings;
+            json.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
             ConfigureDatabase();
             ConfigureSearch();
             ConfigureAuth(app, container);
             ConfigurePushNotifications();
             ConfigureApplicationInsights();
-
+          
             MvcHandler.DisableMvcResponseHeader = true;
         }
+
+    
     }
 }
